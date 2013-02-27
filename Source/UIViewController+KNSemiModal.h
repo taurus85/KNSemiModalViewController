@@ -21,7 +21,8 @@ extern const struct KNSemiModalOptionKeys {
 } KNSemiModalOptionKeys;
 
 NS_ENUM(NSUInteger, KNSemiModalTransitionStyle) {
-	KNSemiModalTransitionStyleSlideUp,
+	KNSemiModalTransitionStyleSlideDown,
+    KNSemiModalTransitionStyleSlideUp,
 	KNSemiModalTransitionStyleFadeInOut,
 	KNSemiModalTransitionStyleFadeIn,
 	KNSemiModalTransitionStyleFadeOut,

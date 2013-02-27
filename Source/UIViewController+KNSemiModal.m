@@ -71,7 +71,7 @@ const struct KNSemiModalOptionKeys KNSemiModalOptionKeys = {
      KNSemiModalOptionKeys.animationDuration : @0.5,
      KNSemiModalOptionKeys.parentAlpha : @0.5,
      KNSemiModalOptionKeys.shadowOpacity : @0.8,
-     KNSemiModalOptionKeys.transitionStyle : @(KNSemiModalTransitionStyleSlideUp),
+     KNSemiModalOptionKeys.transitionStyle : @(KNSemiModalTransitionStyleSlideDown),
 	 }];
 }
 
@@ -201,8 +201,17 @@ const struct KNSemiModalOptionKeys KNSemiModalOptionKeys = {
         // Calulate all frames
         CGFloat semiViewHeight = view.frame.size.height;
         CGRect vf = target.bounds;
-        CGRect semiViewFrame = CGRectMake(0, vf.size.height-semiViewHeight, vf.size.width, semiViewHeight);
-        CGRect overlayFrame = CGRectMake(0, 0, vf.size.width, vf.size.height-semiViewHeight);
+        CGRect semiViewFrame;
+        CGRect overlayFrame;
+        
+        if (transitionStyle == KNSemiModalTransitionStyleSlideDown) {
+            semiViewFrame = CGRectMake(0, 20, vf.size.width, semiViewHeight);
+            overlayFrame= CGRectMake(0, 20+semiViewHeight, vf.size.width, vf.size.height-semiViewHeight);
+        }
+        else {
+            semiViewFrame = CGRectMake(0, vf.size.height-semiViewHeight, vf.size.width, semiViewHeight);
+            overlayFrame = CGRectMake(0, 0, vf.size.width, vf.size.height-semiViewHeight);
+        }
         
         // Add semi overlay
         UIView * overlay = [[UIView alloc] initWithFrame:target.bounds];
@@ -236,9 +245,18 @@ const struct KNSemiModalOptionKeys KNSemiModalOptionKeys = {
         }];
         
         // Present view animated
-        view.frame = (transitionStyle == KNSemiModalTransitionStyleSlideUp
-                      ? CGRectOffset(semiViewFrame, 0, +semiViewHeight)
-                      : semiViewFrame);
+        switch (transitionStyle) {
+            case KNSemiModalTransitionStyleSlideUp:
+                view.frame = CGRectOffset(semiViewFrame, 0, +semiViewHeight);
+                break;
+            case KNSemiModalTransitionStyleSlideDown:
+                view.frame = CGRectOffset(semiViewFrame, 0, -semiViewHeight);
+                break;
+            default:
+                view.frame = semiViewFrame;
+                break;
+        }
+
         if (transitionStyle == KNSemiModalTransitionStyleFadeIn || transitionStyle == KNSemiModalTransitionStyleFadeInOut) {
             view.alpha = 0.0;
         }
@@ -254,7 +272,7 @@ const struct KNSemiModalOptionKeys KNSemiModalOptionKeys = {
         view.layer.rasterizationScale = [[UIScreen mainScreen] scale];
         
         [UIView animateWithDuration:duration animations:^{
-            if (transitionStyle == KNSemiModalTransitionStyleSlideUp) {
+            if (transitionStyle == KNSemiModalTransitionStyleSlideUp || transitionStyle == KNSemiModalTransitionStyleSlideDown) {
                 view.frame = semiViewFrame;
             } else if (transitionStyle == KNSemiModalTransitionStyleFadeIn || transitionStyle == KNSemiModalTransitionStyleFadeInOut) {
                 view.alpha = 1.0;
@@ -290,7 +308,9 @@ const struct KNSemiModalOptionKeys KNSemiModalOptionKeys = {
 	}
 	
     [UIView animateWithDuration:duration animations:^{
-        if (transitionStyle == KNSemiModalTransitionStyleSlideUp) {
+        if (transitionStyle == KNSemiModalTransitionStyleSlideDown) {
+            modal.frame = CGRectMake(0, 20-target.bounds.size.height, modal.frame.size.width, modal.frame.size.height);
+        } else if (transitionStyle == KNSemiModalTransitionStyleSlideUp) {
             modal.frame = CGRectMake(0, target.bounds.size.height, modal.frame.size.width, modal.frame.size.height);
         } else if (transitionStyle == KNSemiModalTransitionStyleFadeOut || transitionStyle == KNSemiModalTransitionStyleFadeInOut) {
             modal.alpha = 0.0;
